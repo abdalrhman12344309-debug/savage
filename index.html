@@ -43,10 +43,6 @@
     outline-offset:2px;
   }
 
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:.01ms !important; transition-duration:.01ms !important;}
-  }
-
   .wrap{max-width:1280px; margin:0 auto; padding:0 24px;}
 
   header{
@@ -263,8 +259,36 @@
   .login-card h2{ font-size:24px; letter-spacing:2px; margin-bottom:10px; }
   .login-card p{ color:var(--muted); font-size:14px; margin-bottom:30px; }
 
-  /* Admin Dashboard Styles */
-  .admin-stats{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  /* Admin Dashboard Styles (Full Page View) */
+  #adminDashboardView {
+    display: none;
+    padding: 30px 0 80px;
+  }
+  .admin-header-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .back-arrow-btn {
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    transition: border-color .15s, color .15s;
+  }
+  .back-arrow-btn:hover {
+    border-color: var(--neon);
+    color: var(--neon);
+  }
+  .admin-stats{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
   .stat-card{ background:var(--bg-elev); border:1px solid var(--line); padding:20px; border-radius:var(--radius); text-align:center; }
   .stat-card span{ display:block; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
   .stat-card b{ font-family:'Orbitron',sans-serif; font-size:24px; color:var(--neon); }
@@ -297,34 +321,69 @@
   </div>
 </header>
 
-<section class="hero">
-  <div class="wrap">
-    <h2>Browse verified accounts</h2>
-    <p class="sub">Search by Account ID, phone number, or skins in the description.</p>
-    <div class="search-row">
+<!-- MAIN STORE VIEW -->
+<div id="mainStoreView">
+  <section class="hero">
+    <div class="wrap">
+      <h2>Browse verified accounts</h2>
+      <p class="sub">Search by Account ID, phone number, or skins in the description.</p>
+      <div class="search-row">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" placeholder="Search ID, phone number, or skin name..." autocomplete="off">
+        </div>
+      </div>
+      <div class="price-range-row" id="priceRangeRow">
+        <button type="button" class="btn btn-ghost chip-all active" id="priceAllBtn">All</button>
+        <input type="number" id="minPriceInput" class="price-input" placeholder="Min $" min="0" step="0.01" inputmode="decimal">
+        <span class="range-sep">&ndash;</span>
+        <input type="number" id="maxPriceInput" class="price-input" placeholder="Max $" min="0" step="0.01" inputmode="decimal">
+        <button type="button" class="btn btn-primary" id="applyPriceBtn">Apply</button>
+      </div>
+      <div class="result-count" id="resultCount"></div>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <div class="grid" id="grid"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <h3>NO ACCOUNTS LISTED YET</h3>
+      <p>Add your first Mobile Legends account to get started.</p>
+    </div>
+  </main>
+</div>
+
+<!-- ADMIN DASHBOARD VIEW (Full Page) -->
+<div id="adminDashboardView" class="wrap">
+  <div class="admin-header-row">
+    <button class="back-arrow-btn" id="adminBackBtn" title="Back to Store">&#8592;</button>
+    <h2>ADMIN DASHBOARD</h2>
+  </div>
+  
+  <div class="admin-stats">
+    <div class="stat-card">
+      <span>Registered Users</span>
+      <b id="adminUserCount">0</b>
+    </div>
+    <div class="stat-card">
+      <span>Published Accounts</span>
+      <b id="adminAccCount">0</b>
+    </div>
+  </div>
+
+  <div class="hero" style="padding: 10px 0 20px; border:none;">
+    <h3 style="font-size:16px; margin-bottom:12px; text-transform:uppercase; color:var(--muted);">Manage & Control Accounts</h3>
+    <div class="search-row" style="margin-top:0;">
       <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" id="searchInput" placeholder="Search ID, phone number, or skin name..." autocomplete="off">
+        <input type="text" id="adminSearchInput" placeholder="Filter accounts to manage..." autocomplete="off">
       </div>
     </div>
-    <div class="price-range-row" id="priceRangeRow">
-      <button type="button" class="btn btn-ghost chip-all active" id="priceAllBtn">All</button>
-      <input type="number" id="minPriceInput" class="price-input" placeholder="Min $" min="0" step="0.01" inputmode="decimal">
-      <span class="range-sep">&ndash;</span>
-      <input type="number" id="maxPriceInput" class="price-input" placeholder="Max $" min="0" step="0.01" inputmode="decimal">
-      <button type="button" class="btn btn-primary" id="applyPriceBtn">Apply</button>
-    </div>
-    <div class="result-count" id="resultCount"></div>
+    <div class="result-count" id="adminResultCount"></div>
   </div>
-</section>
 
-<main class="wrap">
-  <div class="grid" id="grid"></div>
-  <div class="empty-state" id="emptyState" style="display:none;">
-    <h3>NO ACCOUNTS LISTED YET</h3>
-    <p>Add your first Mobile Legends account to get started.</p>
-  </div>
-</main>
+  <div class="grid" id="adminGrid" style="margin-top:20px;"></div>
+</div>
 
 <footer class="wrap">SAVAGE &mdash; Secure Mobile Legends Marketplace</footer>
 
@@ -337,39 +396,37 @@
     </div>
     <form id="addForm" novalidate>
       <div class="modal-body">
-        <div class="field" id="f-id">
-          <label for="accId">Account ID</label>
-          <input type="text" id="accId" name="accId" placeholder="e.g. 123456789" inputmode="numeric">
-          <div class="field-error">Account ID is required.</div>
-        </div>
         <div class="field" id="f-phone">
-          <label for="accPhone">Owner Phone Number</label>
+          <label for="accPhone">WhatsApp Number (with Country Code)</label>
           <input type="tel" id="accPhone" name="accPhone" placeholder="e.g. 201234567890">
-          <div class="hint">Include country code, digits only — used for WhatsApp.</div>
-          <div class="field-error">A valid phone number is required.</div>
+          <div class="hint">Country code + phone digits — required for buyer contact.</div>
+          <div class="field-error">A valid phone number with country code is required.</div>
         </div>
         <div class="field" id="f-price">
           <label for="accPrice">Price (USD)</label>
           <input type="number" id="accPrice" name="accPrice" placeholder="e.g. 45" min="0" step="0.01">
           <div class="field-error">Enter a valid price.</div>
         </div>
-        <div class="field" id="f-desc">
-          <label for="accDesc">Skins &amp; Account Description</label>
-          <textarea id="accDesc" name="accDesc" placeholder="Rank, hero count, exclusive skins, etc."></textarea>
-          <div class="field-error">A description is required.</div>
-        </div>
         <div class="field" id="f-images">
-          <label>Account Images</label>
+          <label>Account Image <span style="color:var(--neon);">(Required)</span></label>
           <div class="file-drop">
-            <input type="file" id="accImages" accept="image/*" multiple>
-            <p><b>Tap to upload</b> — select multiple images</p>
+            <input type="file" id="accImages" accept="image/*">
+            <p><b>Tap to upload</b> — select account image</p>
           </div>
           <div class="preview-grid" id="previewGrid"></div>
-          <div class="field-error" id="imgError">Add at least one image.</div>
+          <div class="field-error" id="imgError">Account image is required.</div>
+        </div>
+        <div class="field" id="f-id">
+          <label for="accId">Account ID <span style="font-weight:500; color:#6a6a72;">(Optional)</span></label>
+          <input type="text" id="accId" name="accId" placeholder="e.g. 123456789" inputmode="numeric">
+        </div>
+        <div class="field" id="f-desc">
+          <label for="accDesc">Skins &amp; Account Description <span style="font-weight:500; color:#6a6a72;">(Optional)</span></label>
+          <textarea id="accDesc" name="accDesc" placeholder="Rank, hero count, exclusive skins, etc."></textarea>
         </div>
         <div class="field" id="f-image-urls">
-          <label for="accImageUrls">Or Image URLs <span style="font-weight:500; color:#6a6a72;">(optional)</span></label>
-          <textarea id="accImageUrls" placeholder="https://i.imgur.com/example1.jpg"></textarea>
+          <label for="accImageUrls">Or Image URL <span style="font-weight:500; color:#6a6a72;">(Optional)</span></label>
+          <textarea id="accImageUrls" placeholder="https://i.imgur.com/example1.jpg" style="min-height:50px;"></textarea>
         </div>
       </div>
       <div class="modal-footer">
@@ -394,11 +451,10 @@
         <button class="gallery-nav next" id="galleryNext">&#8250;</button>
         <div class="gallery-dots" id="galleryDots"></div>
       </div>
-      <div class="details-meta">
-        <div class="meta-chip"><span>Account ID</span><b id="detailId"></b></div>
+      <div class="details-meta" id="detailsMetaRow">
         <div class="meta-chip price"><span>Price</span><b id="detailPrice"></b></div>
       </div>
-      <div class="desc-block">
+      <div class="desc-block" id="descBlockContainer" style="display:none;">
         <h4>Skins &amp; Description</h4>
         <p id="detailDesc"></p>
       </div>
@@ -406,32 +462,6 @@
         <svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm5.8 14.1c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.8-.11-.42-.13-.96-.31-1.65-.6-2.9-1.25-4.8-4.17-4.94-4.36-.15-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.02-2.41.27-.29.58-.36.77-.36.2 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.83 2 .9 2.15.07.15.12.32.02.51-.1.19-.15.31-.3.48-.15.17-.31.38-.44.51-.15.15-.3.31-.13.6.17.29.76 1.25 1.63 2.02 1.12 1 2.06 1.31 2.35 1.46.29.15.46.13.63-.08.17-.21.72-.84.91-1.13.19-.29.38-.24.64-.14.26.1 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36Z"/></svg>
         Chat on WhatsApp
       </a>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN DASHBOARD MODAL -->
-<div class="modal-overlay" id="adminModalOverlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>ADMIN DASHBOARD</h3>
-      <button class="modal-close" data-close="admin">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="admin-stats">
-        <div class="stat-card">
-          <span>Registered Users</span>
-          <b id="adminUserCount">0</b>
-        </div>
-        <div class="stat-card">
-          <span>Published Accounts</span>
-          <b id="adminAccCount">0</b>
-        </div>
-      </div>
-      <p style="color:var(--muted); font-size:13px; text-align:center;">You have full administrator privileges. You can remove any listing directly from the home page.</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary" data-close="admin">Close Dashboard</button>
     </div>
   </div>
 </div>
@@ -472,9 +502,6 @@
   let isSaving = false;
   let hasLoadedOnce = false;
 
-  const MAX_IMAGE_BYTES = 400 * 1024;
-  const MAX_TOTAL_IMAGE_BYTES = 900 * 1024;
-
   // Track Auth State & Save User to Firestore
   onAuthStateChanged(auth, async (user) => {
     const loginOverlay = document.getElementById("loginOverlay");
@@ -482,7 +509,6 @@
       currentUser = user;
       loginOverlay.style.display = "none";
       
-      // Save user info to Firestore collection "users"
       try {
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
@@ -492,7 +518,6 @@
         }, { merge: true });
       } catch (e) { console.error("Error saving user:", e); }
 
-      // Display user badge
       const badge = document.getElementById("userBadge");
       badge.innerHTML = `<img src="${user.photoURL || ''}" alt=""> <span>${user.displayName || user.email}</span>`;
 
@@ -518,23 +543,26 @@
         const data = docSnap.data();
         return {
           uid: docSnap.id,
-          id: data.id,
-          phone: data.phone,
-          price: data.price,
-          description: data.description,
+          id: data.id || "",
+          phone: data.phone || "",
+          price: data.price || 0,
+          description: data.description || "",
           images: data.images || [],
           ownerUid: data.ownerUid || ""
         };
       });
       hasLoadedOnce = true;
       render();
+      if(document.getElementById("adminDashboardView").style.display === "block"){
+        renderAdminDashboardGrid();
+      }
     }, (err) => {
       console.error("Firestore listener error:", err);
     });
   }
 
   function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, function(c){
+    return String(str || "").replace(/[&<>"']/g, function(c){
       return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
     });
   }
@@ -547,22 +575,16 @@
 
   function digitsOnly(str){ return String(str || "").replace(/\D/g, ""); }
 
-  function base64ByteSize(dataUrl){
-    const comma = dataUrl.indexOf(",");
-    const b64 = comma !== -1 ? dataUrl.slice(comma + 1) : dataUrl;
-    const padding = (b64.endsWith("==")) ? 2 : (b64.endsWith("=") ? 1 : 0);
-    return Math.floor((b64.length * 3) / 4) - padding;
-  }
-
   function render(){
     const grid = document.getElementById("grid");
     const empty = document.getElementById("emptyState");
-    const queryVal = document.getElementById("searchInput").value.trim().toLowerCase();
+    const queryInput = document.getElementById("searchInput");
+    const queryVal = queryInput.value.trim().toLowerCase();
 
     // Check for Secret Admin Keyword
     if(queryVal === ADMIN_KEY){
       openAdminDashboard();
-      document.getElementById("searchInput").value = "";
+      queryInput.value = "";
       return;
     }
 
@@ -608,16 +630,17 @@
         ? '<img class="card-img" src="' + escapeAttr(a.images[0]) + '" alt="Account">'
         : '<div class="card-img placeholder">NO IMAGE</div>';
 
-      // Check if current user is owner or admin (you can define specific admin emails if needed, currently checking ownership)
       const isOwner = currentUser && (a.ownerUid === currentUser.uid);
       const deleteBtnHtml = isOwner ? '<button class="delete-btn" data-id="' + escapeAttr(a.uid) + '">Remove</button>' : '';
+
+      const idDisplay = a.id ? escapeHtml(a.id) : "Account Listing";
 
       card.innerHTML =
         imgHtml +
         '<div class="price-badge">$' + escapeHtml(formatPrice(a.price)) + '</div>' +
         '<div class="card-body">' +
-          '<div class="card-id-row"><div class="card-id"><span>Account ID</span>' + escapeHtml(a.id) + '</div></div>' +
-          '<div class="card-desc">' + escapeHtml(a.description) + '</div>' +
+          '<div class="card-id-row"><div class="card-id"><span>Account ID</span>' + idDisplay + '</div></div>' +
+          (a.description ? '<div class="card-desc">' + escapeHtml(a.description) + '</div>' : '') +
           '<div class="card-footer">' +
             '<span class="view-link">View Details &rarr;</span>' +
             deleteBtnHtml +
@@ -648,21 +671,95 @@
     });
   }
 
-  // Admin Dashboard Functionality
+  // Admin Dashboard Functions
   async function openAdminDashboard(){
     try {
       const usersSnap = await getDocs(usersCol);
-      const userCount = usersSnap.size;
-      const accCount = accounts.length;
+      document.getElementById("adminUserCount").textContent = usersSnap.size;
+      document.getElementById("adminAccCount").textContent = accounts.length;
 
-      document.getElementById("adminUserCount").textContent = userCount;
-      document.getElementById("adminAccCount").textContent = accCount;
-      document.getElementById("adminModalOverlay").classList.add("open");
+      document.getElementById("mainStoreView").style.display = "none";
+      document.getElementById("adminDashboardView").style.display = "block";
+      renderAdminDashboardGrid();
+      window.scrollTo(0, 0);
     } catch(e) {
       console.error("Error fetching stats:", e);
       alert("Could not load admin stats.");
     }
   }
+
+  function closeAdminDashboard(){
+    document.getElementById("adminDashboardView").style.display = "none";
+    document.getElementById("mainStoreView").style.display = "block";
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById("adminBackBtn").addEventListener("click", closeAdminDashboard);
+
+  function renderAdminDashboardGrid(){
+    const adminGrid = document.getElementById("adminGrid");
+    const queryVal = document.getElementById("adminSearchInput").value.trim().toLowerCase();
+
+    const filtered = accounts.filter((a) => {
+      if(!queryVal) return true;
+      return (
+        String(a.id).toLowerCase().indexOf(queryVal) !== -1 ||
+        String(a.phone).toLowerCase().indexOf(queryVal) !== -1 ||
+        String(a.description).toLowerCase().indexOf(queryVal) !== -1
+      );
+    });
+
+    document.getElementById("adminResultCount").innerHTML =
+      "Showing <strong>" + filtered.length + "</strong> of <strong>" + accounts.length + "</strong> accounts";
+
+    adminGrid.innerHTML = "";
+    if(filtered.length === 0){
+      adminGrid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><h3>NO MATCHES FOUND</h3></div>';
+      return;
+    }
+
+    filtered.forEach((a) => {
+      const card = document.createElement("article");
+      card.className = "card";
+      
+      const imgHtml = a.images && a.images.length
+        ? '<img class="card-img" src="' + escapeAttr(a.images[0]) + '" alt="Account">'
+        : '<div class="card-img placeholder">NO IMAGE</div>';
+
+      const idDisplay = a.id ? escapeHtml(a.id) : "Account Listing";
+
+      card.innerHTML =
+        imgHtml +
+        '<div class="price-badge">$' + escapeHtml(formatPrice(a.price)) + '</div>' +
+        '<div class="card-body">' +
+          '<div class="card-id-row"><div class="card-id"><span>Account ID</span>' + idDisplay + '</div></div>' +
+          (a.description ? '<div class="card-desc">' + escapeHtml(a.description) + '</div>' : '') +
+          '<div class="card-footer">' +
+            '<span class="view-link" style="color:var(--muted)">Admin Control</span>' +
+            '<button class="delete-btn admin-del" data-id="' + escapeAttr(a.uid) + '" style="color:var(--danger); font-weight:700;">Delete</button>' +
+          '</div>' +
+        '</div>';
+
+      adminGrid.appendChild(card);
+    });
+
+    adminGrid.querySelectorAll(".admin-del").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const uid = btn.getAttribute("data-id");
+        if(confirm("Permanently delete this account?")){
+          btn.disabled = true;
+          deleteDoc(doc(db, "accounts", uid)).catch((err) => {
+            console.error("Delete failed:", err);
+            alert("Could not remove this listing.");
+            btn.disabled = false;
+          });
+        }
+      });
+    });
+  }
+
+  document.getElementById("adminSearchInput").addEventListener("input", renderAdminDashboardGrid);
 
   const addOverlay = document.getElementById("addModalOverlay");
   const addForm = document.getElementById("addForm");
@@ -673,7 +770,7 @@
     renderPreviewGrid();
     clearFormErrors();
     addOverlay.classList.add("open");
-    document.getElementById("accId").focus();
+    document.getElementById("accPhone").focus();
   }
   function closeAdd(){ addOverlay.classList.remove("open"); }
 
@@ -681,21 +778,17 @@
   document.querySelectorAll('[data-close="add"]').forEach(el => el.addEventListener("click", closeAdd));
   addOverlay.addEventListener("click", (e) => { if(e.target === addOverlay) closeAdd(); });
 
-  document.querySelectorAll('[data-close="admin"]').forEach(el => {
-    el.addEventListener("click", () => { document.getElementById("adminModalOverlay").classList.remove("open"); });
-  });
-
   document.getElementById("accImages").addEventListener("change", (e) => {
     const files = Array.from(e.target.files || []);
-    files.forEach(file => {
-      if(file.size > MAX_IMAGE_BYTES) return;
+    if(files.length > 0){
+      const file = files[0];
       const reader = new FileReader();
       reader.onload = (ev) => {
-        addImagesBuffer.push(ev.target.result);
+        addImagesBuffer = [ev.target.result];
         renderPreviewGrid();
       };
       reader.readAsDataURL(file);
-    });
+    }
     e.target.value = "";
   });
 
@@ -715,8 +808,9 @@
   }
 
   function clearFormErrors(){
-    ["f-id","f-phone","f-price","f-desc","f-images"].forEach(id => {
-      document.getElementById(id).classList.remove("invalid");
+    ["f-phone","f-price","f-images"].forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.classList.remove("invalid");
     });
   }
 
@@ -729,26 +823,24 @@
     if(isSaving || !currentUser) return;
     clearFormErrors();
 
-    const id = document.getElementById("accId").value.trim();
     const phone = digitsOnly(document.getElementById("accPhone").value);
     const price = document.getElementById("accPrice").value;
+    const id = document.getElementById("accId").value.trim();
     const desc = document.getElementById("accDesc").value.trim();
     const urlImages = parseImageUrls(document.getElementById("accImageUrls").value);
     const allImages = addImagesBuffer.concat(urlImages);
 
     let valid = true;
-    if(!id){ document.getElementById("f-id").classList.add("invalid"); valid = false; }
     if(!phone || phone.length < 7){ document.getElementById("f-phone").classList.add("invalid"); valid = false; }
     if(price === "" || isNaN(price) || Number(price) < 0){ document.getElementById("f-price").classList.add("invalid"); valid = false; }
-    if(!desc){ document.getElementById("f-desc").classList.add("invalid"); valid = false; }
     if(allImages.length === 0){ document.getElementById("f-images").classList.add("invalid"); valid = false; }
     if(!valid) return;
 
     const newAccount = {
-      id: id,
+      id: id || "",
       phone: phone,
       price: Number(price),
-      description: desc,
+      description: desc || "",
       images: allImages,
       ownerUid: currentUser.uid,
       createdAt: serverTimestamp()
@@ -777,10 +869,24 @@
     const a = accounts.find(x => x.uid === uid);
     if(!a) return;
 
-    document.getElementById("detailsTitle").textContent = "ACCOUNT " + a.id;
-    document.getElementById("detailId").textContent = a.id;
+    document.getElementById("detailsTitle").textContent = a.id ? ("ACCOUNT " + a.id) : "ACCOUNT DETAILS";
     document.getElementById("detailPrice").textContent = "$" + formatPrice(a.price);
-    document.getElementById("detailDesc").textContent = a.description;
+    
+    // Meta chips container
+    const metaRow = document.getElementById("detailsMetaRow");
+    metaRow.innerHTML = '<div class="meta-chip price"><span>Price</span><b id="detailPrice">$' + escapeHtml(formatPrice(a.price)) + '</b></div>';
+    if(a.id){
+      metaRow.innerHTML += '<div class="meta-chip"><span>Account ID</span><b>' + escapeHtml(a.id) + '</b></div>';
+    }
+
+    const descBlock = document.getElementById("descBlockContainer");
+    if(a.description){
+      document.getElementById("detailDesc").textContent = a.description;
+      descBlock.style.display = "block";
+    } else {
+      descBlock.style.display = "none";
+    }
+
     document.getElementById("waLink").href = "https://wa.me/" + encodeURIComponent(a.phone);
 
     currentGallery.images = a.images || [];
