@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SAVAGE — Mobile Legends Account Marketplace</title>
-<!-- PWA Manifest & Theme -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00d2ff">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -107,21 +104,6 @@
   }
   .hero h2{ font-size:clamp(20px, 3vw, 28px); letter-spacing:1px; }
   .hero .sub{ color:var(--muted); font-size:15px; margin-top:6px; }
-  
-  /* زر تثبيت التطبيق العائم أو البارز */
-  .install-banner {
-    display: none;
-    margin-top: 15px;
-    background: linear-gradient(135deg, rgba(0,210,255,0.15), rgba(0,162,255,0.05));
-    border: 1px solid var(--neon);
-    padding: 14px 20px;
-    border-radius: var(--radius);
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-  }
-  .install-banner p { margin: 0; font-size: 14px; color: var(--text); font-weight: 600; }
-
   .search-row{ margin-top:22px; display:flex; gap:12px; align-items:center; }
   .search-box{ position:relative; flex:1; }
   .price-range-row{ margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
@@ -345,13 +327,6 @@
     <div class="wrap">
       <h2>Browse verified accounts</h2>
       <p class="sub">Search by Account ID, phone number, or skins in the description.</p>
-      
-      <!-- نافذة أو زر طلب تثبيت التطبيق -->
-      <div class="install-banner" id="installBanner">
-        <p>⚡ قم بتثبيت تطبيق <b>SAVAGE</b> على شاشتك الرئيسية لتجربة أسرع وأفضل!</p>
-        <button class="btn btn-primary" id="customInstallBtn">تثبيت التطبيق</button>
-      </div>
-
       <div class="search-row">
         <div class="search-box">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -500,47 +475,6 @@
   import {
     getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-
-  // Service Worker Registration for PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then((reg) => console.log('Service Worker registered successfully', reg))
-        .catch((err) => console.log('Service Worker registration failed', err));
-    });
-  }
-
-  // PWA Install Prompt Logic
-  let deferredPrompt;
-  const installBanner = document.getElementById('installBanner');
-  const customInstallBtn = document.getElementById('customInstallBtn');
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if(installBanner) {
-      installBanner.style.display = 'flex';
-    }
-  });
-
-  if(customInstallBtn) {
-    customInstallBtn.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-        }
-        deferredPrompt = null;
-        if(installBanner) installBanner.style.display = 'none';
-      }
-    });
-  }
-
-  window.addEventListener('appinstalled', () => {
-    if(installBanner) installBanner.style.display = 'none';
-    console.log('PWA was installed');
-  });
 
   const firebaseConfig = {
     apiKey: "AIzaSyC4MwmYfhxhLqH1ZzdV4spHkKJyuWcG0hA",
@@ -961,7 +895,6 @@
     detailsOverlay.classList.add("open");
   }
 
-  document.querySelectorAll('[data-close="details"]').headerEl?.addEventListener("click", () => detailsOverlay.classList.remove("open"));
   document.querySelectorAll('[data-close="details"]').forEach(el => el.addEventListener("click", () => detailsOverlay.classList.remove("open")));
   detailsOverlay.addEventListener("click", (e) => { if(e.target === detailsOverlay) detailsOverlay.classList.remove("open"); });
 
@@ -1003,7 +936,6 @@
     render();
   });
 
-  document.getElementById("priceAllBtn").classList.add("active");
   document.getElementById("priceAllBtn").addEventListener("click", () => {
     document.getElementById("minPriceInput").value = "";
     document.getElementById("maxPriceInput").value = "";
