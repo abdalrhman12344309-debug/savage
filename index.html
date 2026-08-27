@@ -451,9 +451,7 @@
         <button class="gallery-nav next" id="galleryNext">&#8250;</button>
         <div class="gallery-dots" id="galleryDots"></div>
       </div>
-      <div class="details-meta" id="detailsMetaRow">
-        <div class="meta-chip price"><span>Price</span><b id="detailPrice"></b></div>
-      </div>
+      <div class="details-meta" id="detailsMetaRow"></div>
       <div class="desc-block" id="descBlockContainer" style="display:none;">
         <h4>Skins &amp; Description</h4>
         <p id="detailDesc"></p>
@@ -469,8 +467,8 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import {
-    getFirestore, collection, addDoc, deleteDoc, doc, setDoc, getDocs,
-    onSnapshot, query, orderBy, serverTimestamp
+    getFirestore, collection, addDoc, deleteDoc, doc, setDoc,
+    getCountFromServer, onSnapshot, query, orderBy, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
   import {
     getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged
@@ -492,7 +490,7 @@
   const accountsCol = collection(db, "accounts");
   const usersCol = collection(db, "users");
 
-  const ADMIN_KEY = "savagestore123456789savagestore";
+  const ADMIN_EMAIL = "abdalrhman12344309@gmail.com";
   let currentUser = null;
   let accounts = [];
   let minPrice = null;
@@ -581,8 +579,8 @@
     const queryInput = document.getElementById("searchInput");
     const queryVal = queryInput.value.trim().toLowerCase();
 
-    // Check for Secret Admin Keyword
-    if(queryVal === ADMIN_KEY){
+    // Check for Admin Keyword and Admin Email
+    if(queryVal === "admin" && currentUser && currentUser.email === ADMIN_EMAIL){
       openAdminDashboard();
       queryInput.value = "";
       return;
@@ -671,11 +669,11 @@
     });
   }
 
-  // Admin Dashboard Functions
+  // Admin Dashboard Functions (Optimized with getCountFromServer)
   async function openAdminDashboard(){
     try {
-      const usersSnap = await getDocs(usersCol);
-      document.getElementById("adminUserCount").textContent = usersSnap.size;
+      const usersCountSnap = await getCountFromServer(usersCol);
+      document.getElementById("adminUserCount").textContent = usersCountSnap.data().count;
       document.getElementById("adminAccCount").textContent = accounts.length;
 
       document.getElementById("mainStoreView").style.display = "none";
@@ -870,11 +868,10 @@
     if(!a) return;
 
     document.getElementById("detailsTitle").textContent = a.id ? ("ACCOUNT " + a.id) : "ACCOUNT DETAILS";
-    document.getElementById("detailPrice").textContent = "$" + formatPrice(a.price);
     
-    // Meta chips container
+    // Meta chips container (تمت إزالة id="detailPrice" نهائياً)
     const metaRow = document.getElementById("detailsMetaRow");
-    metaRow.innerHTML = '<div class="meta-chip price"><span>Price</span><b id="detailPrice">$' + escapeHtml(formatPrice(a.price)) + '</b></div>';
+    metaRow.innerHTML = '<div class="meta-chip price"><span>Price</span><b>$' + escapeHtml(formatPrice(a.price)) + '</b></div>';
     if(a.id){
       metaRow.innerHTML += '<div class="meta-chip"><span>Account ID</span><b>' + escapeHtml(a.id) + '</b></div>';
     }
