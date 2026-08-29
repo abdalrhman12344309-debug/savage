@@ -408,10 +408,10 @@
           <div class="field-error">Enter a valid price.</div>
         </div>
         <div class="field" id="f-images">
-          <label>Account Image <span style="color:var(--neon);">(Required)</span></label>
+          <label>Account Images <span style="color:var(--neon);">(Max 5 Images)</span></label>
           <div class="file-drop">
-            <input type="file" id="accImages" accept="image/*">
-            <p><b>Tap to upload</b> — select account image</p>
+            <input type="file" id="accImages" accept="image/*" multiple>
+            <p><b>Tap to upload</b> — select up to 5 images</p>
           </div>
           <div class="preview-grid" id="previewGrid"></div>
           <div class="field-error" id="imgError">Account image is required.</div>
@@ -425,7 +425,7 @@
           <textarea id="accDesc" name="accDesc" placeholder="Rank, hero count, exclusive skins, etc."></textarea>
         </div>
         <div class="field" id="f-image-urls">
-          <label for="accImageUrls">Or Image URL <span style="font-weight:500; color:#6a6a72;">(Optional)</span></label>
+          <label for="accImageUrls">Or Image URLs <span style="font-weight:500; color:#6a6a72;">(Optional - One per line)</span></label>
           <textarea id="accImageUrls" placeholder="https://i.imgur.com/example1.jpg" style="min-height:50px;"></textarea>
         </div>
       </div>
@@ -669,7 +669,7 @@
     });
   }
 
-  // Admin Dashboard Functions (Optimized with getCountFromServer)
+  // Admin Dashboard Functions
   async function openAdminDashboard(){
     try {
       const usersCountSnap = await getCountFromServer(usersCol);
@@ -776,17 +776,55 @@
   document.querySelectorAll('[data-close="add"]').forEach(el => el.addEventListener("click", closeAdd));
   addOverlay.addEventListener("click", (e) => { if(e.target === addOverlay) closeAdd(); });
 
-  document.getElementById("accImages").addEventListener("change", (e) => {
-    const files = Array.from(e.target.files || []);
-    if(files.length > 0){
-      const file = files[0];
+  // دالة ضغط الصور برمجياً
+  function compressImage(file, maxWidth = 1000, quality = 0.65) {
+    return new Promise((resolve) => {
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        addImagesBuffer = [ev.target.result];
-        renderPreviewGrid();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
+          resolve(compressedBase64);
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
+    });
+  }
+
+  // دعم اختيار صور متعددة مع حد أقصى 5 صور
+  document.getElementById("accImages").addEventListener("change", async (e) => {
+    const files = Array.from(e.target.files || []);
+    
+    if (addImagesBuffer.length + files.length > 5) {
+      alert("يمكنك إضافة 5 صور كحد أقصى فقط.");
+      e.target.value = "";
+      return;
     }
+
+    for (const file of files) {
+      if (addImagesBuffer.length < 5) {
+        const compressed = await compressImage(file);
+        addImagesBuffer.push(compressed);
+      }
+    }
+    
+    renderPreviewGrid();
     e.target.value = "";
   });
 
@@ -826,7 +864,7 @@
     const id = document.getElementById("accId").value.trim();
     const desc = document.getElementById("accDesc").value.trim();
     const urlImages = parseImageUrls(document.getElementById("accImageUrls").value);
-    const allImages = addImagesBuffer.concat(urlImages);
+    const allImages = addImagesBuffer.concat(urlImages).slice(0, 5);
 
     let valid = true;
     if(!phone || phone.length < 7){ document.getElementById("f-phone").classList.add("invalid"); valid = false; }
@@ -869,7 +907,6 @@
 
     document.getElementById("detailsTitle").textContent = a.id ? ("ACCOUNT " + a.id) : "ACCOUNT DETAILS";
     
-    // Meta chips container (تمت إزالة id="detailPrice" نهائياً)
     const metaRow = document.getElementById("detailsMetaRow");
     metaRow.innerHTML = '<div class="meta-chip price"><span>Price</span><b>$' + escapeHtml(formatPrice(a.price)) + '</b></div>';
     if(a.id){
